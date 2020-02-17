@@ -9,17 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class XMLSchemaGenerator {
+public class XMLSchemaGenerator extends Thread {
     private String fileName;
     private List<String> paths;
+    private XMLSchemaCollector collector;
 
-    public XMLSchemaGenerator(String fileName) {
+    public XMLSchemaGenerator(String fileName, XMLSchemaCollector collector) {
         this.fileName = fileName;
         this.paths = new ArrayList<>();
-    }
-
-    public List<String> getPaths() {
-        return this.paths;
+        this.collector = collector;
     }
 
 
@@ -29,8 +27,8 @@ public class XMLSchemaGenerator {
             Node n = nList.item(temp);
 
             if (n.getNodeName().equals("#text")) {
-                if (!sb.toString().isEmpty()) {
 
+                if (!sb.toString().isEmpty()) {
                     this.paths.add(sb.toString());
                 }
                 sb = new StringBuilder();
@@ -49,10 +47,7 @@ public class XMLSchemaGenerator {
                     sb.append(st.pop());
                 }
 
-
             }
-
-
 
 
             if (n.hasChildNodes()) {
@@ -64,9 +59,14 @@ public class XMLSchemaGenerator {
 
     }
 
+    @Override
+    public void run() {
+        processFile();
+        collector.addSchema(this.paths);
+    }
 
 
-    public void processFile() {
+    private void processFile() {
 
         try {
 
@@ -75,18 +75,11 @@ public class XMLSchemaGenerator {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
 
-            //optional, but recommended
-            //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
             doc.getDocumentElement().normalize();
 
 
             NodeList nList = doc.getFirstChild().getChildNodes();
-            String rootName = doc.getFirstChild().getNodeName();
 
-            System.out.println(rootName);
-
-
-            System.out.println("----------------------------");
             StringBuilder sb = new StringBuilder();
 
 
