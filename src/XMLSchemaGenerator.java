@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,17 +36,19 @@ public class XMLSchemaGenerator extends Thread {
                 continue;
             } else {
                 Node current = n;
-                Stack<String> st = new Stack<>();
+                List<String> path = new ArrayList<>();
                 while (current != null) {
-                    st.push(current.getNodeName());
-                    st.push("/");
+                    String nodeName = current.getNodeName();
+                    if (!nodeName.equalsIgnoreCase("#document")) {
+                        path.add(current.getNodeName());
+                    }
 
                     current = current.getParentNode();
                 }
 
-                while (!st.isEmpty()) {
-                    sb.append(st.pop());
-                }
+                Collections.reverse(path);
+
+                sb.append(String.join("/", path));
 
             }
 

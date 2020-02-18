@@ -1,5 +1,4 @@
 import java.io.File;
-import java.util.List;
 
 public class XmlSchemaProcessorApplication {
     public static void main(String[] args) {
@@ -27,10 +26,15 @@ public class XmlSchemaProcessorApplication {
                 System.out.println(e.getMessage());
             }
 
-            for (List<String> schema : collector.getSchemas()) {
-                schema.forEach(System.out::println);
-                System.out.println();
+            System.out.println(collector.getSchemas().size());
+
+            try {
+                new XMLSchemaParser(listOfFiles, collector).process();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
+
+
         }
 
 
