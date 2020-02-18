@@ -12,6 +12,8 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class XMLSchemaParser {
@@ -28,7 +30,7 @@ public class XMLSchemaParser {
 
         // run xpath queries against all 400 xml files
         // to see the percentage hits by node path
-
+        List<XMLQueryResult> results = new ArrayList<>();
         for (List<String> schema : collector.getSchemas()) {
 
 
@@ -51,13 +53,21 @@ public class XMLSchemaParser {
                     }
                 }
 
+                double fraction = (double) count / total;
+                int percentage = (int)(fraction * 100);
 
-                System.out.println(String.format("percentage of path %s is %1.2f", path, (double) count / total));
+
+
+                XMLQueryResult result = new XMLQueryResult(path, count, percentage);
+                results.add(result);
 
             }
 
 
         }
+
+        results.sort(Comparator.comparing(XMLQueryResult::getHits).reversed());
+        results.forEach(System.out::println);
 
 
     }
